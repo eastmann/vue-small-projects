@@ -1,0 +1,17 @@
+{
+    "name": "vue-crash-course",
+    "version": "1.0.0",
+    "description": "",
+    "main": "index.js",
+    "dependencies": {
+        "vite": "^1.0.0-rc.4"
+    },
+    "devDependencies": {},
+    "scripts": {
+        "build": "vite build",
+        "test": "echo \"Error: no test specified\" && exit 1"
+    },
+    "keywords": [],
+    "author": "",
+    "license": "ISC"
+}
