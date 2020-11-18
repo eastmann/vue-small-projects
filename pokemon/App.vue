@@ -1,84 +1,57 @@
 <template>
-    <div class="cards">
-        <div class="card" v-for="starter in starters">
-            <div class="title">
-                {{ starter.name}}
-            </div>
-            <div class="content">
-                <img :src="starter.sprite">
-            </div>
-            <div class="description">
-                <div v-for="type in starter.types">{{ type }}</div>
-            </div>
-        </div>
-    </div>
+    <pokemon-cards :pokemons="starters"
+                   :selectedId="selectedId"
+                   @pokemonClicked="fetchEvolutions" />
+
+    <pokemon-cards :pokemons="evolutions" />
 </template>
 
 <script>
-const api = 'https://pokeapi.co/api/v2/pokemon';
-const ids = [1, 4, 7];
+import Card from './Card.vue';
+import PokemonCards from './PokemonCards.vue';
+
+const API = 'https://pokeapi.co/api/v2/pokemon';
+const STARTER_IDS = [1, 4, 7];
 
 export default {
-    created() {
-        this.fetchData();
+    components: {
+        Card,
+        PokemonCards
+    },
+
+    async created() {
+        this.starters = await this.fetchData(STARTER_IDS);
     },
 
     data() {
         return {
-            starters: null
+            starters: [],
+            evolutions: [],
+            selectedId: null
         }
     },
 
     methods: {
-        async fetchData() {
-            const responses = await Promise.all(ids.map(id => fetch(`${api}/${id}`)));
+        async fetchData(ids) {
+            const responses = await Promise.all(ids.map(id => fetch(`${API}/${id}`)));
             const data = await Promise.all(responses.map(response => response.json()));
-            this.starters = data.map(datum => ({
+            return data.map(datum => ({
+                id: datum.id,
                 name: datum.name,
                 sprite: datum.sprites.other['official-artwork'].front_default,
                 types: datum.types.map(type => type.type.name)
             }));
-            console.log(this.starters);
+            // console.log(this.starters);
+        },
+
+        async fetchEvolutions(pokemon) {
+            this.evolutions = await this.fetchData([pokemon.id + 1, pokemon.id + 2]);
+            this.selectedId = pokemon.id;
+            // console.log(evolutions);
         }
     }
 }
 </script>
 
 <style scoped>
-.cards {
-    display: flex;
-}
-
-.card {
-    border: 1px solid silver;
-    border-radius: 8px;
-    max-width: 200px;
-    margin: 0 5px;
-    cursor: pointer;
-    box-shadow: 0px 1px 3px darkgrey;
-    transition: 0.2s;
-}
-
-img {
-    max-width: 100%;
-}
-
-.title, .content, .description {
-    padding: 16px;
-    text-transform: capitalize;
-    text-align: center;
-}
-
-.title, .content {
-    border-bottom: 1px solid silver;
-}
-
-.title {
-    font-size: 1.25em;
-}
-
-.card:hover {
-    transition: 0.2s;
-    box-shadow: 0px 1px 9px darkgrey;
-}
 </style>
